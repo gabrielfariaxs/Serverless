@@ -1,0 +1,26 @@
+=== Teste sam local start-api (Padrao / Sem Warm Containers) ===
+
+Servidor iniciado com:
+sam local start-api --port 3000
+
+Payload enviado:
+{"requisicaoId":"R-001","hospital":"H-Recife","bolsas":["O-NEG-0142"]}
+
+Requisicao 1:
+Tempo: 3685 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 1}
+
+Requisicao 2:
+Tempo: 1888 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 1}
+
+Requisicao 3:
+Tempo: 1741 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 1}
+
+Conclusao:
+No modo padrao sem warm containers, cada requisicao HTTP recebida pelo API Gateway local cria e finaliza um container Docker dedicado. Por consequencia, o estado global em memoria da funcao Lambda nao e retido entre requisicoes (invocacaoNesteAmbiente = 1 em todas as chamadas).
+

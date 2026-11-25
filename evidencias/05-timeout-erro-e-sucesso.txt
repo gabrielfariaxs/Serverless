@@ -1,0 +1,51 @@
+=== Teste de Timeout (Erro e Correcao) ===
+
+Payload de teste:
+{"requisicaoId":"R-003","demorar":true}
+Comportamento no app.py: time.sleep(5) -> execucao dura pelo menos 5 segundos.
+
+--------------------------------------------------
+CASO 1: Timeout de 3 segundos (Globals -> Timeout: 3)
+
+Comando:
+sam local invoke -e events/pedido_demorado.json
+
+Output capturado:
+Invoking app.lambda_handler (python3.12)
+Local image is up-to-date
+Using local image: public.ecr.aws/lambda/python:3.12-rapid-x86_64.
+Mounting C:\Users\Estagiario_Gabriel\Serverless\.aws-sam\build\HelloWorldFunction as /var/task:ro,delegated, inside runtime container
+START RequestId: 92cbf71e-62b4-4ec5-a6ea-798841989809 Version: $LATEST
+Function 'HelloWorldFunction' timed out after 3 seconds
+No response from invoke container for HelloWorldFunction
+
+Analise:
+A funcao foi abortada compulsoriamente pelo runtime Lambda ao atingir o limite estipulado de 3 segundos, sem retornar corpo de resposta HTTP (erro 502/timeout no API Gateway).
+
+--------------------------------------------------
+CASO 2: Timeout aumentado para 10 segundos (Globals -> Timeout: 10)
+
+Alteracao no template.yaml:
+Globals:
+  Function:
+    Timeout: 10
+
+Recompilado com:
+sam build
+
+Comando:
+sam local invoke -e events/pedido_demorado.json
+
+Output capturado:
+Invoking app.lambda_handler (python3.12)
+Local image is up-to-date
+Using local image: public.ecr.aws/lambda/python:3.12-rapid-x86_64.
+Mounting C:\Users\Estagiario_Gabriel\Serverless\.aws-sam\build\HelloWorldFunction as /var/task:ro,delegated, inside runtime container
+START RequestId: ad59c79c-5dc9-4c07-a117-50116f44c086 Version: $LATEST
+END RequestId: ad59c79c-5dc9-4c07-a117-50116f44c086
+REPORT RequestId: ad59c79c-5dc9-4c07-a117-50116f44c086	Init Duration: 0.04 ms	Duration: 5072.25 ms	Billed Duration: 5073 ms	Memory Size: 128 MB	Max Memory Used: 128 MB	
+{"statusCode": 201, "headers": {"Content-Type": "application/json"}, "body": "{\"guia\": \"G-R-003\", \"hospital\": null, \"bolsas\": null, \"invocacaoNesteAmbiente\": 1}"}
+
+Analise:
+Com o limite de 10 segundos, a funcao teve tempo suficiente para concluir a operacao de 5 segundos (Duration: 5072.25 ms) e responder com sucesso (Status 201).
+

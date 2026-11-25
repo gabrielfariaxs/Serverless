@@ -1,0 +1,29 @@
+=== Teste sam local start-api (--warm-containers LAZY) ===
+
+Servidor iniciado com:
+sam local start-api --port 3000 --warm-containers LAZY
+
+Payload enviado:
+{"requisicaoId":"R-001","hospital":"H-Recife","bolsas":["O-NEG-0142"]}
+
+Requisicao 1:
+Tempo: 3395 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 1}
+
+Requisicao 2:
+Tempo: 1086 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 2}
+
+Requisicao 3:
+Tempo: 1092 ms
+Resposta:
+{"guia": "G-R-001", "hospital": "H-Recife", "bolsas": ["O-NEG-0142"], "invocacaoNesteAmbiente": 3}
+
+Conclusao e Comparacao:
+1. Com --warm-containers LAZY, o container e instanciado sob demanda na 1a requisicao e mantido ativo para as requisicoes seguintes.
+2. O tempo de resposta caiu de ~3,4s (cold start) para ~1,08s nas requisicoes subsequentes (warm).
+3. O contador global incrementou progressivamente (1 -> 2 -> 3), evidenciando que a memoria do processo foi preservada no ambiente em execucao.
+4. Isso comprova o principio serverless: o estado so persiste enquanto aquele container especifico estiver vivo/quente, nao havendo garantia de estado permanente entre diferentes ambientes.
+

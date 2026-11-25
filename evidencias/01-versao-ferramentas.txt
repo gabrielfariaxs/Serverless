@@ -1,0 +1,12 @@
+=== Verificacao de Ferramentas ===
+Data/Hora: 2026-11-10 14:18
+
+1. Docker CLI & Engine:
+Docker version 29.7.2, build a7dcaa6
+
+2. AWS SAM CLI:
+SAM CLI, version 1.171.0
+
+3. Python:
+Python 3.12.10
+
